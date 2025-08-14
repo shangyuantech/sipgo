@@ -1,4 +1,4 @@
-module github.com/emiago/sipgo
+module github.com/shangyuantech/sipgo
 
 go 1.20
 

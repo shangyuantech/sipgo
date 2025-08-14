@@ -1,4 +1,4 @@
-module github.com/emiago/example/register
+module github.com/shangyuantech/example/register
 
 go 1.19
 
