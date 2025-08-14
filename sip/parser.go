@@ -222,7 +222,7 @@ func nextLine(reader *bytes.Buffer) (line string, err error) {
 	}
 	lenline := len(line)
 	if lenline < 1 {
-		return line, ErrParseLineNoCRLF
+		return "", nil
 	}
 
 	line = line[:lenline-1]
