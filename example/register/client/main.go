@@ -8,10 +8,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/emiago/sipgo"
-	"github.com/emiago/sipgo/sip"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
+	"github.com/shangyuantech/sipgo"
+	"github.com/shangyuantech/sipgo/sip"
 
 	"github.com/icholy/digest"
 )

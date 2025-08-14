@@ -9,10 +9,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/emiago/sipgo"
-	"github.com/emiago/sipgo/sip"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
+	"github.com/shangyuantech/sipgo"
+	"github.com/shangyuantech/sipgo/sip"
 
 	"github.com/icholy/digest"
 )
@@ -46,7 +46,7 @@ func main() {
 
 	ua, err := sipgo.NewUA(
 		sipgo.WithUserAgent("SIPGO"),
-	// sipgo.WithUserAgentIP(*extIP),
+		// sipgo.WithUserAgentIP(*extIP),
 	)
 	if err != nil {
 		log.Fatal().Err(err).Msg("Fail to setup user agent")

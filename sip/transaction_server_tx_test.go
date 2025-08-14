@@ -5,8 +5,8 @@ import (
 	"io"
 	"testing"
 
-	"github.com/emiago/sipgo/fakes"
 	"github.com/rs/zerolog/log"
+	"github.com/shangyuantech/sipgo/fakes"
 	"github.com/stretchr/testify/require"
 )
 

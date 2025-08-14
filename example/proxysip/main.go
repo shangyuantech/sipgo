@@ -11,11 +11,11 @@ import (
 	"time"
 
 	"github.com/arl/statsviz"
-	"github.com/emiago/sipgo/sip"
+	"github.com/shangyuantech/sipgo/sip"
 
 	_ "net/http/pprof"
 
-	"github.com/emiago/sipgo"
+	"github.com/shangyuantech/sipgo"
 
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/rs/zerolog"

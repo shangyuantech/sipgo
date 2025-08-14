@@ -1,28 +1,28 @@
 <img src="icons/icon.png" width="300" alt="SIPGO">
 
-[![Go Report Card](https://goreportcard.com/badge/github.com/emiago/sipgo)](https://goreportcard.com/report/github.com/emiago/sipgo)
-![Used By](https://sourcegraph.com/github.com/emiago/sipgo/-/badge.svg)
+[![Go Report Card](https://goreportcard.com/badge/github.com/shangyuantech/sipgo)](https://goreportcard.com/report/github.com/emiago/sipgo)
+![Used By](https://sourcegraph.com/github.com/shangyuantech/sipgo/-/badge.svg)
 ![Coverage](https://img.shields.io/badge/coverage-45.9%25-blue)
-[![License](https://img.shields.io/badge/License-BSD_2--Clause-orange.svg)](https://github.com/emiago/sipgo/LICENCE) 
-![GitHub go.mod Go version](https://img.shields.io/github/go-mod/go-version/emiago/sipgo)
+[![License](https://img.shields.io/badge/License-BSD_2--Clause-orange.svg)](https://github.com/shangyuantech/sipgo/LICENCE) 
+![GitHub go.mod Go version](https://img.shields.io/github/go-mod/go-version/shangyuantech/sipgo)
 
 **SIPGO** is library for writing fast SIP services in GO language.  
 It comes with [SIP stack](/sip/README.md) ([RFC 3261](https://datatracker.ietf.org/doc/html/rfc3261)|[RFC3581](https://datatracker.ietf.org/doc/html/rfc3581)) optimized for fast parsing.
 
 For extra functionality checkout also   
-- [github.com/emiago/sipgox](https://github.com/emiago/sipgox) - Extra SIP functionality
-- [github.com/emiago/media](https://github.com/emiago/media) - Adds base functionality for real time media (*sdp, rtp, rtcp*)
+- [github.com/emiago/sipgox](https://github.com/shangyuantech/sipgox) - Extra SIP functionality
+- [github.com/emiago/media](https://github.com/shangyuantech/media) - Adds base functionality for real time media (*sdp, rtp, rtcp*)
 
 Fetch lib with:
 
-`go get github.com/emiago/sipgo`
+`go get github.com/shangyuantech/sipgo`
 
 **NOTE**: LIB MAY HAVE API CHANGES UNTIL STABLE VERSION.
 
 *If you like/use project currently or need additional help/support checkout [Support section](#support) 
 
 
-You can follow on [X/Twitter](https://twitter.com/emiago123) for more updates.
+You can follow on [X/Twitter](https://twitter.com/shangyuantech) for more updates.
 
 
 More on documentation you can find on [Go doc](https://pkg.go.dev/github.com/emiago/sipgo)

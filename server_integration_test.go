@@ -13,7 +13,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/emiago/sipgo/sip"
+	"github.com/shangyuantech/sipgo/sip"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )

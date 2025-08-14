@@ -1,7 +1,7 @@
 package siptest
 
 import (
-	"github.com/emiago/sipgo/sip"
+	"github.com/shangyuantech/sipgo/sip"
 
 	"github.com/rs/zerolog/log"
 )
