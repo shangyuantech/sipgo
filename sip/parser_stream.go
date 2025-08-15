@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"strconv"
+	"strings"
 	"sync"
 )
 
@@ -14,8 +15,6 @@ const (
 	stateContent   = 2
 	// stateParsed = 1
 )
-
-var ()
 
 var streamBufReader = sync.Pool{
 	New: func() interface{} {
@@ -53,74 +52,68 @@ func (p *ParserStream) ParseSIPStream(data []byte) (msgs []Message, err error) {
 	}
 
 	reader := p.reader
-	reader.Write(data) // This should append to our already buffer
-
-	unparsed := reader.Bytes() // TODO find a better way as we only want to move our offset
+	reader.Write(data)
+	unparsed := reader.Bytes()
 
 	parseSingle := func(reader *bytes.Buffer) (msg Message, err error) {
-
-		// TODO change this with functions and store last function state
 		switch p.state {
 		case stateStartLine:
-			startLine, err := nextLine(reader)
-
-			if err != nil {
-				if err == io.EOF {
-					return nil, ErrParseLineNoCRLF
+			for {
+				startLine, err := nextLine(reader)
+				if err != nil {
+					if err == io.EOF {
+						return nil, ErrParseSipPartial
+					}
+					return nil, err
 				}
-				return nil, err
-			}
 
-			if startLine == "" {
-				return nil, nil
-			}
+				startLine = strings.TrimSpace(startLine)
+				if startLine == "" {
+					if reader.Len() == 0 {
+						return nil, ErrParseSipPartial
+					}
+					continue
+				}
 
-			msg, err = parseLine(startLine)
-			if err != nil {
-				return nil, err
-			}
+				msg, err = parseLine(startLine)
+				if err != nil {
+					return nil, err
+				}
 
-			p.state = stateHeader
-			p.msg = msg
+				p.state = stateHeader
+				p.msg = msg
+				break
+			}
 			fallthrough
 		case stateHeader:
 			msg := p.msg
 			for {
 				line, err := nextLine(reader)
-
 				if err != nil {
 					if err == io.EOF {
-						// No more to read
-						return nil, ErrParseLineNoCRLF
+						return nil, ErrParseSipPartial
 					}
 					return nil, err
 				}
 
-				if len(line) == 0 {
-					// We've hit second CRLF
+				if strings.TrimSpace(line) == "" {
 					break
 				}
 
 				err = p.headersParsers.parseMsgHeader(msg, line)
 				if err != nil {
 					return nil, fmt.Errorf("%s: %w", err.Error(), ErrParseEOF)
-					// log.Info().Err(err).Str("line", line).Msg("skip header due to error")
 				}
 				unparsed = reader.Bytes()
 			}
 			unparsed = reader.Bytes()
 
-			// Grab content length header
-			// TODO: Maybe this is not best approach
 			hdrs := msg.GetHeaders("Content-Length")
 			if len(hdrs) == 0 {
-				// No body then
 				return msg, nil
 			}
 
 			h := hdrs[0]
-
-			// TODO: Have fast reference instead casting
 			var contentLength int
 			if clh, ok := h.(*ContentLengthHeader); ok {
 				contentLength = int(*clh)
@@ -147,17 +140,21 @@ func (p *ParserStream) ParseSIPStream(data []byte) (msgs []Message, err error) {
 			contentLength := len(body)
 
 			n, err := reader.Read(body[p.readContentLength:])
-			unparsed = reader.Bytes()
 			if err != nil {
+				if err == io.EOF {
+					return nil, ErrParseSipPartial
+				}
 				return nil, fmt.Errorf("read message body failed: %w", err)
 			}
 			p.readContentLength += n
+			unparsed = reader.Bytes()
 
 			if p.readContentLength < contentLength {
-				return nil, ErrParseReadBodyIncomplete
+				return nil, ErrParseSipPartial
 			}
 
-			p.state = -1 // Clear state
+			p.state = -1
+			p.readContentLength = 0
 			return msg, nil
 		default:
 			return nil, fmt.Errorf("Parser is in unknown state")
@@ -167,19 +164,22 @@ func (p *ParserStream) ParseSIPStream(data []byte) (msgs []Message, err error) {
 	for {
 		msg, err := parseSingle(reader)
 		switch err {
-		case ErrParseLineNoCRLF, ErrParseReadBodyIncomplete:
+		case ErrParseSipPartial:
+			// 数据未完整，保留 buffer，等待下一次读取
 			reader.Reset()
 			reader.Write(unparsed)
-			return nil, ErrParseSipPartial
+			return msgs, nil
 		}
 
 		if err != nil {
 			return nil, err
 		}
 
-		msgs = append(msgs, msg)
+		if msg != nil {
+			msgs = append(msgs, msg)
+		}
+
 		if len(unparsed) == 0 {
-			// Maybe we need to check did empty spaces left
 			break
 		}
 
@@ -189,9 +189,7 @@ func (p *ParserStream) ParseSIPStream(data []byte) (msgs []Message, err error) {
 		p.reader = reader
 	}
 
-	// IN all other cases do reset
 	streamBufReader.Put(reader)
 	p.reset()
-
-	return
+	return msgs, nil
 }

@@ -198,34 +198,35 @@ func parseLine(startLine string) (msg Message, err error) {
 // terminated by a carriage-return line-feed sequence (CRLF).  Note that
 // the empty line MUST be present even if the message-body is not.
 func nextLine(reader *bytes.Buffer) (line string, err error) {
-	// https://www.rfc-editor.org/rfc/rfc3261.html#section-7
-	// The start-line, each message-header line, and the empty line MUST be
-	// terminated by a carriage-return line-feed sequence (CRLF).  Note that
-	// the empty line MUST be present even if the message-body is not.
+	if reader.Len() == 0 {
+		return "", io.EOF
+	}
 
-	// Lines could be multiline as well so this is also acceptable
-	// TO :
-	// sip:vivekg@chair-dnrc.example.com ;   tag    = 1918181833n
-
+	// 读取到 CR
 	line, err = reader.ReadString('\r')
 	if err != nil {
-		// We may get io.EOF and line till it was read
-		return line, err
+		if err == io.EOF {
+			// 数据未完整，等待下一次读取
+			return "", ErrParseSipPartial
+		}
+		return "", err
 	}
+
+	// 读取紧随其后的 LF
 	br, err := reader.ReadByte()
 	if err != nil {
-		return line, err
+		if err == io.EOF {
+			return "", ErrParseSipPartial
+		}
+		return "", err
 	}
 
 	if br != '\n' {
-		return line, ErrParseLineNoCRLF
-	}
-	lenline := len(line)
-	if lenline < 1 {
-		return "", nil
+		return "", ErrParseLineNoCRLF
 	}
 
-	line = line[:lenline-1]
+	// 去掉 CR，不去掉 LF，因为已经读取了
+	line = strings.TrimSuffix(line, "\r")
 	return line, nil
 }
 
